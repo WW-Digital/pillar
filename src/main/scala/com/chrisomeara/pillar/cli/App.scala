@@ -4,7 +4,7 @@ import java.io.{FileReader, File}
 import java.util.Properties
 
 import com.chrisomeara.pillar._
-import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.{ConsistencyLevel, QueryOptions, Cluster}
 import com.google.common.base.Strings
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -38,7 +38,10 @@ class App(reporter: Reporter) {
     val port = Integer.valueOf(getFromConfiguration(configuration, dataStoreName, environment, "cassandra-port", Some(9042.toString)))
     val properties = loadProperties(configuration, dataStoreName, environment)
 
-    val clusterBuilder = Cluster.builder().addContactPoint(seedAddress).withPort(port)
+    val queryOptions = new QueryOptions()
+    queryOptions.setConsistencyLevel(ConsistencyLevel.ALL)
+
+    val clusterBuilder = Cluster.builder().addContactPoint(seedAddress).withPort(port).withQueryOptions(queryOptions)
     if (properties != null) {
       val authProvider = PlainTextAuthProviderFactory.fromProperties(properties)
       if (authProvider != null) {
