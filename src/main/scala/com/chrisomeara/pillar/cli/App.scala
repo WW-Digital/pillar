@@ -39,7 +39,7 @@ class App(reporter: Reporter) {
     val properties = loadProperties(configuration, dataStoreName, environment)
 
     val queryOptions = new QueryOptions()
-    queryOptions.setConsistencyLevel(ConsistencyLevel.ALL)
+    queryOptions.setConsistencyLevel(ConsistencyLevel.QUORUM)
 
     val clusterBuilder = Cluster.builder().addContactPoint(seedAddress).withPort(port).withQueryOptions(queryOptions)
     if (properties != null) {
