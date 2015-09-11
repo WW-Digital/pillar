@@ -1,7 +1,7 @@
 package com.chrisomeara.pillar
 
 import java.util.Date
-import com.datastax.driver.core.Session
+import com.datastax.driver.core.{ConsistencyLevel, Session}
 import com.datastax.driver.core.querybuilder.QueryBuilder
 
 object Migration {
@@ -56,6 +56,7 @@ trait Migration {
       value("authored_at", authoredAt).
       value("description", description).
       value("applied_at", System.currentTimeMillis())
+      .setConsistencyLevel(ConsistencyLevel.ALL)
     )
   }
 }
