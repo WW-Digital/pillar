@@ -4,8 +4,11 @@ import java.util.Date
 
 import com.datastax.driver.core.Session
 import com.datastax.driver.core.exceptions.AlreadyExistsException
+import org.slf4j.LoggerFactory
 
 class CassandraMigrator(registry: Registry) extends Migrator {
+  val logger = LoggerFactory.getLogger(this.getClass)
+
   override def migrate(session: Session, dateRestriction: Option[Date] = None) {
     val appliedMigrations = AppliedMigrations(session, registry)
     selectMigrationsToReverse(dateRestriction, appliedMigrations).foreach(_.executeDownStatement(session))
@@ -39,10 +42,13 @@ class CassandraMigrator(registry: Registry) extends Migrator {
   }
 
   private def selectMigrationsToApply(dateRestriction: Option[Date], appliedMigrations: AppliedMigrations): Seq[Migration] = {
-    (dateRestriction match {
+    val migrations = (dateRestriction match {
       case None => registry.all
       case Some(cutOff) => registry.authoredBefore(cutOff)
     }).filter(!appliedMigrations.contains(_))
+
+    migrations.foreach(m => logger.info(s"Would like to apply $m"))
+    migrations
   }
 
   private def selectMigrationsToReverse(dateRestriction: Option[Date], appliedMigrations: AppliedMigrations): Seq[Migration] = {

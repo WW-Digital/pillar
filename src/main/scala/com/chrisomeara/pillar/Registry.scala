@@ -3,7 +3,11 @@ package com.chrisomeara.pillar
 import java.util.Date
 import java.io.{FileInputStream, File}
 
+import org.slf4j.LoggerFactory
+
 object Registry {
+  var log = LoggerFactory.getLogger(this.getClass)
+
   def apply(migrations: Seq[Migration]): Registry = {
     new Registry(migrations)
   }
@@ -17,14 +21,19 @@ object Registry {
   }
 
   private def parseMigrationsInDirectory(directory: File): Seq[Migration] = {
-    if(!directory.isDirectory) return List.empty
+    if(!directory.isDirectory) {
+      log.info(s"${directory.getAbsolutePath} is not a directory")
+      return List.empty
+    }
 
     val parser = Parser()
 
     directory.listFiles().map {
+      val files = directory.listFiles()
       file =>
         val stream = new FileInputStream(file)
         try {
+          log.info(s"Attempting to parse ${file.getAbsolutePath}")
           parser.parse(stream)
         } finally {
           stream.close()
