@@ -3,6 +3,7 @@ package com.chrisomeara.pillar
 object ReplicationOptions {
   val default = new ReplicationOptions(Map("class" -> "SimpleStrategy", "replication_factor" -> 3))
   val core_default = new ReplicationOptions(Map("class" -> "NetworkTopologyStrategy", "DATA" -> 3, "ANALYTICS" -> 3))
+  val core_prod = new ReplicationOptions(Map("class" -> "NetworkTopologyStrategy", "MRDATA" -> 3, "ANALYTICS" -> 3))
 }
 
 class ReplicationOptions(options: Map[String, Any]) {
